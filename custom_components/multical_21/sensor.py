@@ -160,11 +160,13 @@ class KamstrupMeterSensor(KamstrupSensor):
     @property
     def native_unit_of_measurement(self) -> str | None:
         """Return the unit of measurement of the sensor, if any."""
-        if self.coordinator.data and self.coordinator.data[self.int_key]:
-            device_unit = self.coordinator.data[self.int_key].get("unit", None)
-            # Use device unit if provided and not empty, otherwise fall back to description
-            if device_unit:
-                return device_unit
+        if self.coordinator.data:
+            value_data = self.coordinator.data.get(self.int_key)
+            if value_data:
+                device_unit = value_data.get("unit", None)
+                # Use device unit if provided and not empty, otherwise fall back to description
+                if device_unit:
+                    return device_unit
         
         # Fall back to the unit defined in the entity description
         return self.entity_description.native_unit_of_measurement
