@@ -6,6 +6,7 @@ import serialx
 import voluptuous as vol
 
 from homeassistant import config_entries
+from homeassistant.components import persistent_notification
 from homeassistant.const import CONF_NAME, CONF_PORT, CONF_SCAN_INTERVAL, CONF_TIMEOUT
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
@@ -151,14 +152,51 @@ class KamstrupOptionsFlowHandler(config_entries.OptionsFlow):
 
     async def async_step_init(self, user_input=None):
         """Manage the options."""
-        return self.async_show_menu(
-            step_id="init",
-            menu_options=["user", "scan"],
-        )
-
-    async def async_step_user(self, user_input=None):
-        """Handle a flow initialized by the user."""
         if user_input is not None:
+            scan_input = user_input.pop("scan_registers", "").strip()
+            if scan_input:
+                try:
+                    registers = [
+                        int(register.strip(), 0)
+                        for register in scan_input.split(",")
+                        if register.strip()
+                    ]
+                    if not 1 <= len(registers) <= 32 or any(
+                        register < 0 or register > 65535 for register in registers
+                    ):
+                        raise ValueError
+                except (TypeError, ValueError):
+                    return self.async_show_form(
+                        step_id="init",
+                        data_schema=self._options_schema(scan_input),
+                        errors={"base": "invalid_registers"},
+                    )
+
+                coordinator = self.hass.data.get(DOMAIN, {}).get(
+                    self.config_entry.entry_id
+                )
+                if coordinator is None:
+                    return self.async_abort(reason="scan_failed")
+
+                try:
+                    results = await coordinator.async_scan_registers(registers)
+                    output = (
+                        "\n".join(
+                            f"{register} (0x{register:04X}): {value} {unit or ''}".rstrip()
+                            for register, (value, unit) in sorted(results.items())
+                        )
+                        if results
+                        else "Keine lesbaren Register gefunden."
+                    )
+                    persistent_notification.async_create(
+                        self.hass,
+                        f"Gefundene Register:\n\n{output}",
+                        title="Multical 21: Register-Scan abgeschlossen",
+                        notification_id="multical_21_register_scan",
+                    )
+                except Exception:
+                    return self.async_abort(reason="scan_failed")
+
             return self.async_create_entry(
                 title=self.config_entry.data.get(
                     CONF_NAME, self.config_entry.data.get(CONF_PORT)
@@ -166,95 +204,30 @@ class KamstrupOptionsFlowHandler(config_entries.OptionsFlow):
                 data=user_input,
             )
 
-        return self.async_show_form(
-            step_id="user",
-            data_schema=vol.Schema(
-                {
-                    vol.Required(
-                        CONF_SCAN_INTERVAL,
-                        default=self.config_entry.options.get(
-                            CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
-                        ),
-                    ): vol.All(vol.Coerce(int), vol.Range(min=1, max=86400)),
-                    vol.Required(
-                        CONF_TIMEOUT,
-                        default=self.config_entry.options.get(
-                            CONF_TIMEOUT, DEFAULT_TIMEOUT
-                        ),
-                    ): vol.All(vol.Coerce(float), vol.Range(min=0.0, max=5.0)),
-                    vol.Required(
-                        CONF_BAUDRATE,
-                        default=self.config_entry.options.get(
-                            CONF_BAUDRATE, DEFAULT_BAUDRATE
-                        ),
-                    ): vol.In(SUPPORTED_BAUDRATES),
-                }
-            ),
-        )
+        return self.async_show_form(step_id="init", data_schema=self._options_schema())
 
-    async def async_step_scan(self, user_input=None):
-        """Scan explicitly selected KMP registers once."""
-        if user_input is not None:
-            try:
-                registers = [
-                    int(register.strip(), 0)
-                    for register in user_input["registers"].split(",")
-                    if register.strip()
-                ]
-                if not 1 <= len(registers) <= 32 or any(
-                    register < 0 or register > 65535 for register in registers
-                ):
-                    raise ValueError
-            except (TypeError, ValueError):
-                return self.async_show_form(
-                    step_id="scan",
-                    data_schema=self._scan_schema(user_input["registers"]),
-                    errors={"base": "invalid_registers"},
-                )
-
-            coordinator = self.hass.data.get(DOMAIN, {}).get(self.config_entry.entry_id)
-            if coordinator is None:
-                return self.async_abort(reason="scan_failed")
-
-            try:
-                results = await coordinator.async_scan_registers(registers)
-            except Exception:
-                return self.async_abort(reason="scan_failed")
-
-            if results:
-                output = "\n".join(
-                    f"{register} (0x{register:04X}): {value} {unit or ''}".rstrip()
-                    for register, (value, unit) in sorted(results.items())
-                )
-            else:
-                output = "Keine lesbaren Register gefunden."
-
-            self._scan_results = output
-            return await self.async_step_scan_result()
-
-        return self.async_show_form(
-            step_id="scan",
-            data_schema=self._scan_schema(),
-        )
-
-    async def async_step_scan_result(self, user_input=None):
-        """Show the result of the register scan."""
-        if user_input is not None:
-            return await self.async_step_init()
-
-        return self.async_show_form(
-            step_id="scan_result",
-            data_schema=vol.Schema({}),
-            description_placeholders={
-                "results": getattr(self, "_scan_results", "Keine Ergebnisse.")
-            },
-            )
-
-    @staticmethod
-    def _scan_schema(default: str = "80,81,82,83,84,85,86,87,88,89") -> vol.Schema:
-        """Build the register scan input schema."""
+    def _options_schema(self, scan_default: str = "") -> vol.Schema:
+        """Build the combined options and optional scan schema."""
         return vol.Schema(
             {
-                vol.Required("registers", default=default): str,
+                vol.Required(
+                    CONF_SCAN_INTERVAL,
+                    default=self.config_entry.options.get(
+                        CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
+                    ),
+                ): vol.All(vol.Coerce(int), vol.Range(min=1, max=86400)),
+                vol.Required(
+                    CONF_TIMEOUT,
+                    default=self.config_entry.options.get(
+                        CONF_TIMEOUT, DEFAULT_TIMEOUT
+                    ),
+                ): vol.All(vol.Coerce(float), vol.Range(min=0.0, max=5.0)),
+                vol.Required(
+                    CONF_BAUDRATE,
+                    default=self.config_entry.options.get(
+                        CONF_BAUDRATE, DEFAULT_BAUDRATE
+                    ),
+                ): vol.In(SUPPORTED_BAUDRATES),
+                vol.Optional("scan_registers", default=scan_default): str,
             }
         )
