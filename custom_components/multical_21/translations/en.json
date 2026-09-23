@@ -30,27 +30,13 @@
   "options": {
     "step": {
       "init": {
-        "menu": {
-          "user": "Settings",
-          "scan": "Scan registers"
-        }
-      },
-      "scan": {
-        "title": "Scan KMP registers",
-        "description": "Enter up to 32 registers as decimal or hexadecimal values, separated by commas. The scan runs once and is not saved.",
-        "data": {
-          "registers": "Registers"
-        }
-      },
-      "scan_result": {
-        "title": "Register scan complete",
-        "description": "Registers found:\n{results}"
-      },
-      "user": {
+        "title": "Multical 21 options",
+        "description": "Adjust polling settings. Optionally enter registers for a one-time scan; results appear as a Home Assistant notification.",
         "data": {
           "scan_interval": "Scan interval (seconds)",
           "timeout": "Serial read timeout (seconds)",
-          "baudrate": "Baud rate"
+          "baudrate": "Baud rate",
+          "scan_registers": "Scan registers once"
         }
       }
     },
@@ -59,6 +45,7 @@
       "scan_failed": "The register scan could not be completed."
     },
     "abort": {
+      "scan_complete": "Register scan complete.\n\nRegisters found:\n{results}",
       "scan_failed": "The meter could not be read."
     }
   }

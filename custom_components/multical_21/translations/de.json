@@ -30,27 +30,13 @@
   "options": {
     "step": {
       "init": {
-        "menu": {
-          "user": "Einstellungen",
-          "scan": "Register scannen"
-        }
-      },
-      "scan": {
-        "title": "KMP-Register scannen",
-        "description": "Gib bis zu 32 Register als Dezimal- oder Hexwerte ein, getrennt durch Kommas. Der Scan wird nur einmal ausgeführt und nicht gespeichert.",
-        "data": {
-          "registers": "Register"
-        }
-      },
-      "scan_result": {
-        "title": "Register-Scan abgeschlossen",
-        "description": "Gefundene Register:\n{results}"
-      },
-      "user": {
+        "title": "Multical 21 Optionen",
+        "description": "Passe die Abfrage an. Optional kannst du hier einen einmaligen Register-Scan starten. Die Ergebnisse erscheinen als Benachrichtigung in Home Assistant.",
         "data": {
           "scan_interval": "Abfrageintervall (Sekunden)",
           "timeout": "Timeout beim seriellen Lesen (Sekunden)",
-          "baudrate": "Baudrate"
+          "baudrate": "Baudrate",
+          "scan_registers": "Register einmalig scannen"
         }
       }
     },
@@ -59,6 +45,7 @@
       "scan_failed": "Der Register-Scan konnte nicht ausgeführt werden."
     },
     "abort": {
+      "scan_complete": "Register-Scan abgeschlossen.\n\nGefundene Register:\n{results}",
       "scan_failed": "Der Zähler konnte nicht gelesen werden."
     }
   }
