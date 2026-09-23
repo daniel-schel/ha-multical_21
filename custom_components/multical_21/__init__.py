@@ -206,12 +206,12 @@ def _read_kamstrup_values(client: Kamstrup, commands: List[int]) -> dict:
 
 def _scan_kamstrup_registers(
     client: Kamstrup, registers: list[int]
-) -> dict[int, tuple[Any, Any]]:
+) -> dict[int, tuple[Any, Any, Any, Any]]:
     """Read explicitly requested registers and skip unsupported responses."""
     results = {}
     for register in registers:
         try:
-            value, unit = client.get_value(register)
+            value, unit, unit_code, response_hex = client.get_value_details(register)
         except (OSError, TimeoutError, serialx.SerialException):
             raise
         except Exception as exception:
@@ -219,10 +219,22 @@ def _scan_kamstrup_registers(
             continue
 
         if value is not None:
-            results[register] = (value, unit)
-            _LOGGER.info("KMP register %s: %s %s", register, value, unit or "")
+            results[register] = (value, unit, unit_code, response_hex)
+            _LOGGER.info(
+                "KMP register %s: %s %s (unit_code=%s response=%s)",
+                register,
+                value,
+                unit or "",
+                unit_code,
+                response_hex or "",
+            )
         else:
-            _LOGGER.debug("KMP register %s returned no value", register)
+            _LOGGER.debug(
+                "KMP register %s returned no value (unit_code=%s response=%s)",
+                register,
+                unit_code,
+                response_hex or "",
+            )
 
     return results
 
@@ -246,7 +258,7 @@ class KamstrupUpdateCoordinator(DataUpdateCoordinator):
 
     async def async_scan_registers(
         self, registers: list[int]
-    ) -> dict[int, tuple[Any, Any]]:
+    ) -> dict[int, tuple[Any, Any, Any, Any]]:
         """Read a list of registers once without adding them to polling."""
         async with self._io_lock:
             return await self.hass.async_add_executor_job(

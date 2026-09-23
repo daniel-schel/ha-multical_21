@@ -59,6 +59,34 @@ DESCRIPTIONS: list[SensorEntityDescription] = [
         state_class=None,
         entity_registry_enabled_default=False,
     ),
+    SensorEntityDescription(
+        key="98",  # 0x0062
+        name="MeterDateShort",
+        icon="mdi:calendar-outline",
+        device_class=None,
+        state_class=None,
+    ),
+    SensorEntityDescription(
+        key="1001",  # 0x03e9
+        name="MeterNumber",
+        icon="mdi:counter",
+        device_class=None,
+        state_class=None,
+    ),
+    SensorEntityDescription(
+        key="1002",  # 0x03ea
+        name="MeterTime",
+        icon="mdi:clock-outline",
+        device_class=None,
+        state_class=None,
+    ),
+    SensorEntityDescription(
+        key="1003",  # 0x03eb
+        name="MeterDate",
+        icon="mdi:calendar",
+        device_class=None,
+        state_class=None,
+    ),
 ]
 
 

@@ -182,8 +182,11 @@ class KamstrupOptionsFlowHandler(config_entries.OptionsFlow):
                     results = await coordinator.async_scan_registers(registers)
                     output = (
                         "\n".join(
-                            f"{register} (0x{register:04X}): {value} {unit or ''}".rstrip()
-                            for register, (value, unit) in sorted(results.items())
+                            f"{register} (0x{register:04X}): {value} {unit or ''} "
+                            f"[unit_code={unit_code}, response={response_hex or '-'}]"
+                            for register, (value, unit, unit_code, response_hex) in sorted(
+                                results.items()
+                            )
                         )
                         if results
                         else "Keine lesbaren Register gefunden."

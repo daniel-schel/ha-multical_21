@@ -150,18 +150,27 @@ class Kamstrup:
         self, nbr: int
     ) -> (tuple[None, None] | tuple[float | None, str | None]):
         """Get a value from the meter"""
+        value, unit, _, _ = self.get_value_details(nbr)
+        return value, unit
+
+    def get_value_details(
+        self, nbr: int
+    ) -> tuple[float | None, str | None, int | None, str | None]:
+        """Get a value and raw response details from the meter."""
         self._send(0x80, (0x3F, 0x10, 0x01, nbr >> 8, nbr & 0xFF))
 
         bytearray_data = self._receive()
         if bytearray_data is None or len(bytearray_data) < 2:
-            return (None, None)
+            return (None, None, None, None)
 
         if bytearray_data[0] != 0x3F or bytearray_data[1] != 0x10:
-            return (None, None)
+            return (None, None, None, bytearray_data.hex())
 
-        value, unit = self._process_response(nbr, bytearray_data[2:])
+        response_data = bytearray_data[2:]
+        unit_code = response_data[2] if len(response_data) > 2 else None
+        value, unit = self._process_response(nbr, response_data)
 
-        return (value, unit)
+        return (value, unit, unit_code, response_data.hex())
 
     def get_values(self, multiple_nbr: list[int]) -> dict:
         """Get values from the meter"""
