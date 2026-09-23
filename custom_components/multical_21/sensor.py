@@ -1,5 +1,9 @@
 """Sensor platform for kamstrup_21."""
 
+import json
+from pathlib import Path
+from typing import Any
+
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
@@ -13,81 +17,65 @@ from homeassistant.helpers.typing import StateType
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from . import KamstrupUpdateCoordinator
-from .const import DEFAULT_NAME, DOMAIN
+from .const import DOMAIN
 
-DESCRIPTIONS: list[SensorEntityDescription] = [
-    SensorEntityDescription(
-        key="68",  # 0x0044
-        name="V1",
-        icon="mdi:water",
-        device_class=SensorDeviceClass.WATER,
-        # Changed from TOTAL_INCREASING to TOTAL to allow counter resets
-        state_class=SensorStateClass.TOTAL,
-        native_unit_of_measurement="m³",  # Default unit if device doesn't provide one
-    ),
-    SensorEntityDescription(
-        key="243",  # 0x00f3
-        name="V1Reverse",
-        icon="mdi:water-sync",
-        device_class=SensorDeviceClass.WATER,
-        # Changed from TOTAL_INCREASING to TOTAL to allow counter resets
-        state_class=SensorStateClass.TOTAL,
-        native_unit_of_measurement="m³",  # Default unit if device doesn't provide one
-    ),
-    SensorEntityDescription(
-        key="74",  # 0x004a
-        name="Flow",
-        icon="mdi:waves",
-        device_class=SensorDeviceClass.VOLUME_FLOW_RATE,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement="L/h",
-    ),
-    SensorEntityDescription(
-        key="1004",  # 0x03ec
-        name="HoursCounter",
-        icon="mdi:clock",
-        device_class=SensorDeviceClass.DURATION,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement="h",  # Default unit: hours
-        entity_registry_enabled_default=False,
-    ),
-    SensorEntityDescription(
-        key="99",  # 0x0063
-        name="Info",
-        icon="mdi:information",
-        device_class=None,
-        state_class=None,
-        entity_registry_enabled_default=False,
-    ),
-    SensorEntityDescription(
-        key="98",  # 0x0062
-        name="MeterDateShort",
-        icon="mdi:calendar-outline",
-        device_class=None,
-        state_class=None,
-    ),
-    SensorEntityDescription(
-        key="1001",  # 0x03e9
-        name="MeterNumber",
-        icon="mdi:counter",
-        device_class=None,
-        state_class=None,
-    ),
-    SensorEntityDescription(
-        key="1002",  # 0x03ea
-        name="MeterTime",
-        icon="mdi:clock-outline",
-        device_class=None,
-        state_class=None,
-    ),
-    SensorEntityDescription(
-        key="1003",  # 0x03eb
-        name="MeterDate",
-        icon="mdi:calendar",
-        device_class=None,
-        state_class=None,
-    ),
-]
+_DEVICE_CLASSES = {
+    "water": SensorDeviceClass.WATER,
+    "volume_flow_rate": SensorDeviceClass.VOLUME_FLOW_RATE,
+    "duration": SensorDeviceClass.DURATION,
+}
+_STATE_CLASSES = {
+    "total": SensorStateClass.TOTAL,
+    "measurement": SensorStateClass.MEASUREMENT,
+}
+
+
+def _load_descriptions() -> list[SensorEntityDescription]:
+    """Load sensor descriptions from the integration configuration file."""
+    with Path(__file__).with_name("sensors.json").open(encoding="utf-8") as file:
+        configurations: list[dict[str, Any]] = json.load(file)
+
+    return [
+        SensorEntityDescription(
+            key=configuration["key"],
+            name=configuration["name"],
+            icon=configuration.get("icon"),
+            device_class=_DEVICE_CLASSES.get(configuration.get("device_class")),
+            state_class=_STATE_CLASSES.get(configuration.get("state_class")),
+            native_unit_of_measurement=configuration.get(
+                "native_unit_of_measurement"
+            ),
+            entity_registry_enabled_default=configuration.get(
+                "entity_registry_enabled_default", True
+            ),
+        )
+        for configuration in configurations
+    ]
+
+
+DESCRIPTIONS = _load_descriptions()
+
+
+def _format_special_value(
+    key: str, value: str | float, unit: str | None
+) -> str | float:
+    """Format KMP date/time values and integer-like information fields."""
+    if unit == "yy:mm:dd":
+        return f"{int(value):06d}"[:2] + ":" + f"{int(value):06d}"[2:4] + ":" + f"{int(value):06d}"[4:]
+    if unit == "yyyy:mm:dd":
+        formatted = f"{int(value):08d}"
+        return f"{formatted[:4]}:{formatted[4:6]}:{formatted[6:]}"
+    if unit == "mm:dd":
+        formatted = f"{int(value):04d}"
+        return f"{formatted[:2]}:{formatted[2:]}"
+    if unit == "hh:mm:ss":
+        formatted = f"{int(value):06d}"
+        return f"{formatted[:2]}:{formatted[2:4]}:{formatted[4:]}"
+    if unit == "Bitfield":
+        return str(int(value))
+    if key in {"99", "1001", "113", "1005"} and float(value).is_integer():
+        return str(int(value))
+    return value
 
 
 async def async_setup_entry(
@@ -154,7 +142,12 @@ class KamstrupMeterSensor(KamstrupSensor):
         if self.coordinator.data:
             value_data = self.coordinator.data.get(self.int_key)
             if value_data:
-                return value_data.get("value", None)
+                value = value_data.get("value", None)
+                unit = value_data.get("unit", None)
+                if value is not None:
+                    return _format_special_value(
+                        self.entity_description.key, value, unit
+                    )
 
         return None
 
@@ -165,8 +158,14 @@ class KamstrupMeterSensor(KamstrupSensor):
             value_data = self.coordinator.data.get(self.int_key)
             if value_data:
                 device_unit = value_data.get("unit", None)
-                # Use device unit if provided and not empty, otherwise fall back to description
-                if device_unit:
+                if device_unit not in {
+                    "yy:mm:dd",
+                    "yyyy:mm:dd",
+                    "mm:dd",
+                    "hh:mm:ss",
+                    "ASCII",
+                    "Bitfield",
+                } and device_unit:
                     return device_unit
         
         # Fall back to the unit defined in the entity description

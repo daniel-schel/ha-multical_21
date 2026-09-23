@@ -1,0 +1,281 @@
+[
+  {
+    "key": "68",
+    "name": "V1",
+    "icon": "mdi:water",
+    "device_class": "water",
+    "state_class": "total",
+    "native_unit_of_measurement": "m³"
+  },
+  {
+    "key": "243",
+    "name": "V1Reverse",
+    "icon": "mdi:water-sync",
+    "device_class": "water",
+    "state_class": "total",
+    "native_unit_of_measurement": "m³"
+  },
+  {
+    "key": "74",
+    "name": "Flow",
+    "icon": "mdi:waves",
+    "device_class": "volume_flow_rate",
+    "state_class": "measurement",
+    "native_unit_of_measurement": "L/h"
+  },
+  {
+    "key": "1004",
+    "name": "HoursCounter",
+    "icon": "mdi:clock",
+    "device_class": "duration",
+    "state_class": "measurement",
+    "native_unit_of_measurement": "h",
+    "entity_registry_enabled_default": false
+  },
+  {
+    "key": "99",
+    "name": "Info",
+    "icon": "mdi:information",
+    "entity_registry_enabled_default": false
+  },
+  {
+    "key": "98",
+    "name": "MeterDateShort",
+    "icon": "mdi:calendar-outline"
+  },
+  {
+    "key": "1001",
+    "name": "MeterNumber",
+    "icon": "mdi:counter"
+  },
+  {
+    "key": "1002",
+    "name": "MeterTime",
+    "icon": "mdi:clock-outline"
+  },
+  {
+    "key": "1003",
+    "name": "MeterDate",
+    "icon": "mdi:calendar"
+  },
+  {
+    "key": "113",
+    "name": "Register113",
+    "icon": "mdi:information-outline"
+  },
+  {
+    "key": "1005",
+    "name": "Register1005",
+    "icon": "mdi:information-outline"
+  },
+  {
+    "key": "138",
+    "name": "FlowRecord1Date",
+    "icon": "mdi:calendar-outline"
+  },
+  {
+    "key": "139",
+    "name": "FlowRecord1",
+    "icon": "mdi:waves"
+  },
+  {
+    "key": "140",
+    "name": "FlowRecord2Date",
+    "icon": "mdi:calendar-outline"
+  },
+  {
+    "key": "141",
+    "name": "FlowRecord2",
+    "icon": "mdi:waves"
+  },
+  {
+    "key": "153",
+    "name": "Register153",
+    "icon": "mdi:alphabetical-variant"
+  },
+  {
+    "key": "154",
+    "name": "Register154",
+    "icon": "mdi:information-outline"
+  },
+  {
+    "key": "155",
+    "name": "Register155",
+    "icon": "mdi:flash-outline"
+  },
+  {
+    "key": "222",
+    "name": "Register222",
+    "icon": "mdi:information-outline"
+  },
+  {
+    "key": "223",
+    "name": "Register223",
+    "icon": "mdi:water-outline"
+  },
+  {
+    "key": "237",
+    "name": "Register237",
+    "icon": "mdi:information-outline"
+  },
+  {
+    "key": "238",
+    "name": "Register238",
+    "icon": "mdi:information-outline"
+  },
+  {
+    "key": "239",
+    "name": "Register239",
+    "icon": "mdi:water-outline"
+  },
+  {
+    "key": "240",
+    "name": "Register240",
+    "icon": "mdi:information-outline"
+  },
+  {
+    "key": "241",
+    "name": "Register241",
+    "icon": "mdi:water-outline"
+  },
+  {
+    "key": "242",
+    "name": "Register242",
+    "icon": "mdi:water-outline"
+  },
+  {
+    "key": "244",
+    "name": "Register244",
+    "icon": "mdi:information-outline"
+  },
+  {
+    "key": "253",
+    "name": "Register253",
+    "icon": "mdi:information-outline"
+  },
+  {
+    "key": "254",
+    "name": "Register254",
+    "icon": "mdi:alphabetical-variant"
+  },
+  {
+    "key": "261",
+    "name": "Register261",
+    "icon": "mdi:code-braces"
+  },
+  {
+    "key": "262",
+    "name": "Register262",
+    "icon": "mdi:information-outline"
+  },
+  {
+    "key": "263",
+    "name": "Register263",
+    "icon": "mdi:information-outline"
+  },
+  {
+    "key": "264",
+    "name": "Register264",
+    "icon": "mdi:information-outline"
+  },
+  {
+    "key": "265",
+    "name": "Register265",
+    "icon": "mdi:code-braces"
+  },
+  {
+    "key": "292",
+    "name": "Register292",
+    "icon": "mdi:thermometer"
+  },
+  {
+    "key": "293",
+    "name": "Register293",
+    "icon": "mdi:thermometer"
+  },
+  {
+    "key": "294",
+    "name": "Register294",
+    "icon": "mdi:thermometer"
+  },
+  {
+    "key": "295",
+    "name": "Register295",
+    "icon": "mdi:thermometer"
+  },
+  {
+    "key": "296",
+    "name": "Register296",
+    "icon": "mdi:thermometer"
+  },
+  {
+    "key": "297",
+    "name": "Register297",
+    "icon": "mdi:thermometer"
+  },
+  {
+    "key": "298",
+    "name": "Register298",
+    "icon": "mdi:thermometer-alert"
+  },
+  {
+    "key": "299",
+    "name": "Register299",
+    "icon": "mdi:thermometer"
+  },
+  {
+    "key": "300",
+    "name": "Register300",
+    "icon": "mdi:thermometer"
+  },
+  {
+    "key": "301",
+    "name": "Register301",
+    "icon": "mdi:thermometer"
+  },
+  {
+    "key": "302",
+    "name": "Register302",
+    "icon": "mdi:thermometer"
+  },
+  {
+    "key": "303",
+    "name": "Register303",
+    "icon": "mdi:thermometer"
+  },
+  {
+    "key": "304",
+    "name": "Register304",
+    "icon": "mdi:thermometer"
+  },
+  {
+    "key": "305",
+    "name": "Register305",
+    "icon": "mdi:thermometer"
+  },
+  {
+    "key": "306",
+    "name": "Register306",
+    "icon": "mdi:information-outline"
+  },
+  {
+    "key": "307",
+    "name": "Register307",
+    "icon": "mdi:information-outline"
+  },
+  {
+    "key": "308",
+    "name": "Register308",
+    "icon": "mdi:information-outline"
+  },
+  {
+    "key": "309",
+    "name": "Register309",
+    "icon": "mdi:information-outline"
+  },
+  {
+    "key": "310",
+    "name": "Register310",
+    "icon": "mdi:information-outline"
+  }
+]

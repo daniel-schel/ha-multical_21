@@ -129,6 +129,10 @@ class Kamstrup:
         else:
             unit = None
 
+        if data[2] == 54:
+            value = bytes(data[5 : 5 + data[3]]).decode("ascii", errors="replace")
+            return value, unit
+
         # Decode the mantissa.
         value = 0
         for i in range(0, data[3]):
@@ -148,14 +152,14 @@ class Kamstrup:
 
     def get_value(
         self, nbr: int
-    ) -> (tuple[None, None] | tuple[float | None, str | None]):
+    ) -> tuple[str | float | None, str | None]:
         """Get a value from the meter"""
         value, unit, _, _ = self.get_value_details(nbr)
         return value, unit
 
     def get_value_details(
         self, nbr: int
-    ) -> tuple[float | None, str | None, int | None, str | None]:
+    ) -> tuple[str | float | None, str | None, int | None, str | None]:
         """Get a value and raw response details from the meter."""
         self._send(0x80, (0x3F, 0x10, 0x01, nbr >> 8, nbr & 0xFF))
 
