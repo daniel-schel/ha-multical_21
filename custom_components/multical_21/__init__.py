@@ -124,7 +124,33 @@ def _init_kamstrup_client(port: str, timeout: int, baudrate: int = DEFAULT_BAUDR
 
 def _read_kamstrup_values(client: Kamstrup, commands: List[int]) -> dict:
     """Read values from Kamstrup in executor to avoid blocking."""
-    return client.get_values(commands)
+    values = {}
+
+    for start in range(0, len(commands), 8):
+        chunk = commands[start : start + 8]
+        try:
+            values.update(client.get_values(chunk))
+        except (OSError, TimeoutError, serialx.SerialException):
+            raise
+        except Exception as exception:
+            _LOGGER.warning(
+                "Error reading multiple %s, retrying each command individually: %s",
+                chunk,
+                exception,
+            )
+            for command in chunk:
+                try:
+                    values.update(client.get_values([command]))
+                except (OSError, TimeoutError, serialx.SerialException):
+                    raise
+                except Exception as command_exception:
+                    _LOGGER.warning(
+                        "Register %s is not supported or could not be read: %s",
+                        command,
+                        command_exception,
+                    )
+
+    return values
 
 
 class KamstrupUpdateCoordinator(DataUpdateCoordinator):

@@ -43,6 +43,33 @@ DESCRIPTIONS: list[SensorEntityDescription] = [
         native_unit_of_measurement="L/h",
     ),
     SensorEntityDescription(
+        key="86",  # 0x0056
+        name="Temperature1",
+        icon="mdi:thermometer",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement="°C",
+        entity_registry_enabled_default=False,
+    ),
+    SensorEntityDescription(
+        key="87",  # 0x0057
+        name="Temperature2",
+        icon="mdi:thermometer",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement="°C",
+        entity_registry_enabled_default=False,
+    ),
+    SensorEntityDescription(
+        key="89",  # 0x0059
+        name="TemperatureDifference",
+        icon="mdi:thermometer",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement="K",
+        entity_registry_enabled_default=False,
+    ),
+    SensorEntityDescription(
         key="1004",  # 0x03ec
         name="HoursCounter",
         icon="mdi:clock",
@@ -123,8 +150,10 @@ class KamstrupMeterSensor(KamstrupSensor):
     @property
     def native_value(self) -> StateType:
         """Return the state of the sensor."""
-        if self.coordinator.data and self.coordinator.data[self.int_key]:
-            return self.coordinator.data[self.int_key].get("value", None)
+        if self.coordinator.data:
+            value_data = self.coordinator.data.get(self.int_key)
+            if value_data:
+                return value_data.get("value", None)
 
         return None
 
