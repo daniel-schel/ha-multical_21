@@ -42,6 +42,10 @@
           "registers": "Register"
         }
       },
+      "scan_result": {
+        "title": "Register-Scan abgeschlossen",
+        "description": "Gefundene Register:\n{results}"
+      },
       "user": {
         "data": {
           "scan_interval": "Abfrageintervall (Sekunden)",
@@ -55,14 +59,7 @@
       "scan_failed": "Der Register-Scan konnte nicht ausgeführt werden."
     },
     "abort": {
-      "scan_complete": {
-        "title": "Register-Scan abgeschlossen",
-        "description": "Gefundene Register:\n{results}"
-      },
-      "scan_failed": {
-        "title": "Register-Scan fehlgeschlagen",
-        "description": "Der Zähler konnte nicht gelesen werden."
-      }
+      "scan_failed": "Der Zähler konnte nicht gelesen werden."
     }
   }
 }

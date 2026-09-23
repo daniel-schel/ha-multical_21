@@ -42,6 +42,10 @@
           "registers": "Registers"
         }
       },
+      "scan_result": {
+        "title": "Register scan complete",
+        "description": "Registers found:\n{results}"
+      },
       "user": {
         "data": {
           "scan_interval": "Scan interval (seconds)",
@@ -55,14 +59,7 @@
       "scan_failed": "The register scan could not be completed."
     },
     "abort": {
-      "scan_complete": {
-        "title": "Register scan complete",
-        "description": "Registers found:\n{results}"
-      },
-      "scan_failed": {
-        "title": "Register scan failed",
-        "description": "The meter could not be read."
-      }
+      "scan_failed": "The meter could not be read."
     }
   }
 }

@@ -1,0 +1,17 @@
+scan_registers:
+  name: Scan KMP registers
+  description: Read up to 32 KMP registers once and write the results to the log.
+  fields:
+    registers:
+      name: Registers
+      description: Decimal or hexadecimal register IDs, for example [80, 81, 0x0056].
+      required: true
+      example: "[80, 81, 0x0056]"
+      selector:
+        object: {}
+    entry_id:
+      name: Config entry ID
+      description: Optional config entry ID when more than one Multical 21 is configured.
+      required: false
+      selector:
+        text:

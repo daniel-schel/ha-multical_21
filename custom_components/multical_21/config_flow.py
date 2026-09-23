@@ -229,15 +229,26 @@ class KamstrupOptionsFlowHandler(config_entries.OptionsFlow):
             else:
                 output = "Keine lesbaren Register gefunden."
 
-            return self.async_abort(
-                reason="scan_complete",
-                description_placeholders={"results": output},
-            )
+            self._scan_results = output
+            return await self.async_step_scan_result()
 
         return self.async_show_form(
             step_id="scan",
             data_schema=self._scan_schema(),
         )
+
+    async def async_step_scan_result(self, user_input=None):
+        """Show the result of the register scan."""
+        if user_input is not None:
+            return await self.async_step_init()
+
+        return self.async_show_form(
+            step_id="scan_result",
+            data_schema=vol.Schema({}),
+            description_placeholders={
+                "results": getattr(self, "_scan_results", "Keine Ergebnisse.")
+            },
+            )
 
     @staticmethod
     def _scan_schema(default: str = "80,81,82,83,84,85,86,87,88,89") -> vol.Schema:
