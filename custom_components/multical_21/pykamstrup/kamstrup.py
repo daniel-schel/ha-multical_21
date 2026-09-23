@@ -116,6 +116,10 @@ class Kamstrup:
     @classmethod
     def _process_response(cls, nbr: int, data):
         """Process a response"""
+        if len(data) < 5 or len(data) < 5 + data[3]:
+            _LOGGER.debug("Short response for NBR %s: %s", nbr, data.hex())
+            return (None, None)
+
         if data[0] != nbr >> 8 or data[1] != nbr & 0xFF:
             _LOGGER.debug("NBR error")
             return (None, None)
@@ -149,7 +153,7 @@ class Kamstrup:
         self._send(0x80, (0x3F, 0x10, 0x01, nbr >> 8, nbr & 0xFF))
 
         bytearray_data = self._receive()
-        if bytearray_data is None:
+        if bytearray_data is None or len(bytearray_data) < 2:
             return (None, None)
 
         if bytearray_data[0] != 0x3F or bytearray_data[1] != 0x10:

@@ -151,7 +151,10 @@ class KamstrupOptionsFlowHandler(config_entries.OptionsFlow):
 
     async def async_step_init(self, user_input=None):
         """Manage the options."""
-        return await self.async_step_user()
+        return self.async_show_menu(
+            step_id="init",
+            menu_options=["user", "scan"],
+        )
 
     async def async_step_user(self, user_input=None):
         """Handle a flow initialized by the user."""
@@ -187,4 +190,60 @@ class KamstrupOptionsFlowHandler(config_entries.OptionsFlow):
                     ): vol.In(SUPPORTED_BAUDRATES),
                 }
             ),
+        )
+
+    async def async_step_scan(self, user_input=None):
+        """Scan explicitly selected KMP registers once."""
+        if user_input is not None:
+            try:
+                registers = [
+                    int(register.strip(), 0)
+                    for register in user_input["registers"].split(",")
+                    if register.strip()
+                ]
+                if not 1 <= len(registers) <= 32 or any(
+                    register < 0 or register > 65535 for register in registers
+                ):
+                    raise ValueError
+            except (TypeError, ValueError):
+                return self.async_show_form(
+                    step_id="scan",
+                    data_schema=self._scan_schema(user_input["registers"]),
+                    errors={"base": "invalid_registers"},
+                )
+
+            coordinator = self.hass.data.get(DOMAIN, {}).get(self.config_entry.entry_id)
+            if coordinator is None:
+                return self.async_abort(reason="scan_failed")
+
+            try:
+                results = await coordinator.async_scan_registers(registers)
+            except Exception:
+                return self.async_abort(reason="scan_failed")
+
+            if results:
+                output = "\n".join(
+                    f"{register} (0x{register:04X}): {value} {unit or ''}".rstrip()
+                    for register, (value, unit) in sorted(results.items())
+                )
+            else:
+                output = "Keine lesbaren Register gefunden."
+
+            return self.async_abort(
+                reason="scan_complete",
+                description_placeholders={"results": output},
+            )
+
+        return self.async_show_form(
+            step_id="scan",
+            data_schema=self._scan_schema(),
+        )
+
+    @staticmethod
+    def _scan_schema(default: str = "80,81,82,83,84,85,86,87,88,89") -> vol.Schema:
+        """Build the register scan input schema."""
+        return vol.Schema(
+            {
+                vol.Required("registers", default=default): str,
+            }
         )

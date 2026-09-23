@@ -43,33 +43,6 @@ DESCRIPTIONS: list[SensorEntityDescription] = [
         native_unit_of_measurement="L/h",
     ),
     SensorEntityDescription(
-        key="86",  # 0x0056
-        name="Temperature1",
-        icon="mdi:thermometer",
-        device_class=SensorDeviceClass.TEMPERATURE,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement="°C",
-        entity_registry_enabled_default=False,
-    ),
-    SensorEntityDescription(
-        key="87",  # 0x0057
-        name="Temperature2",
-        icon="mdi:thermometer",
-        device_class=SensorDeviceClass.TEMPERATURE,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement="°C",
-        entity_registry_enabled_default=False,
-    ),
-    SensorEntityDescription(
-        key="89",  # 0x0059
-        name="TemperatureDifference",
-        icon="mdi:thermometer",
-        device_class=SensorDeviceClass.TEMPERATURE,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement="K",
-        entity_registry_enabled_default=False,
-    ),
-    SensorEntityDescription(
         key="1004",  # 0x03ec
         name="HoursCounter",
         icon="mdi:clock",

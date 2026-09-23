@@ -29,12 +29,39 @@
   },
   "options": {
     "step": {
+      "init": {
+        "menu": {
+          "user": "Settings",
+          "scan": "Scan registers"
+        }
+      },
+      "scan": {
+        "title": "Scan KMP registers",
+        "description": "Enter up to 32 registers as decimal or hexadecimal values, separated by commas. The scan runs once and is not saved.",
+        "data": {
+          "registers": "Registers"
+        }
+      },
       "user": {
         "data": {
           "scan_interval": "Scan interval (seconds)",
           "timeout": "Serial read timeout (seconds)",
           "baudrate": "Baud rate"
         }
+      }
+    },
+    "error": {
+      "invalid_registers": "Enter 1 to 32 valid registers between 0 and 65535.",
+      "scan_failed": "The register scan could not be completed."
+    },
+    "abort": {
+      "scan_complete": {
+        "title": "Register scan complete",
+        "description": "Registers found:\n{results}"
+      },
+      "scan_failed": {
+        "title": "Register scan failed",
+        "description": "The meter could not be read."
       }
     }
   }

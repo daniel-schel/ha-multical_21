@@ -6,14 +6,16 @@ https://github.com/mallewski/ha-multical_21/
 """
 
 from datetime import timedelta
+import asyncio
 import logging
 from typing import Any, List
 
 import serialx
+import voluptuous as vol
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_NAME, CONF_PORT, CONF_SCAN_INTERVAL, CONF_TIMEOUT
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
@@ -34,6 +36,55 @@ from .const import (
 from .pykamstrup.kamstrup import Kamstrup
 
 _LOGGER = logging.getLogger(__name__)
+SERVICE_SCAN_REGISTERS = "scan_registers"
+SCAN_REGISTERS_SCHEMA = vol.Schema(
+    {
+        vol.Required("registers"): vol.All(
+            [vol.All(vol.Coerce(int), vol.Range(min=0, max=65535))],
+            vol.Length(min=1, max=32),
+        ),
+        vol.Optional("entry_id"): str,
+    }
+)
+
+
+async def async_setup(hass: HomeAssistant, config: dict) -> bool:
+    """Set up integration services."""
+    if not hass.services.has_service(DOMAIN, SERVICE_SCAN_REGISTERS):
+
+        async def async_scan_registers(call: ServiceCall) -> None:
+            """Read explicitly requested KMP registers once."""
+            entry_id = call.data.get("entry_id")
+            coordinators = hass.data.get(DOMAIN, {})
+            if entry_id:
+                coordinators = (
+                    {entry_id: coordinators[entry_id]}
+                    if entry_id in coordinators
+                    else {}
+                )
+
+            if not coordinators:
+                _LOGGER.warning(
+                    "No configured Multical 21 entry available for register scan"
+                )
+                return
+
+            for current_entry_id, coordinator in coordinators.items():
+                results = await coordinator.async_scan_registers(call.data["registers"])
+                _LOGGER.info(
+                    "KMP register scan for entry %s returned: %s",
+                    current_entry_id,
+                    results,
+                )
+
+        hass.services.async_register(
+            DOMAIN,
+            SERVICE_SCAN_REGISTERS,
+            async_scan_registers,
+            schema=SCAN_REGISTERS_SCHEMA,
+        )
+
+    return True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -153,6 +204,29 @@ def _read_kamstrup_values(client: Kamstrup, commands: List[int]) -> dict:
     return values
 
 
+def _scan_kamstrup_registers(
+    client: Kamstrup, registers: list[int]
+) -> dict[int, tuple[Any, Any]]:
+    """Read explicitly requested registers and skip unsupported responses."""
+    results = {}
+    for register in registers:
+        try:
+            value, unit = client.get_value(register)
+        except (OSError, TimeoutError, serialx.SerialException):
+            raise
+        except Exception as exception:
+            _LOGGER.warning("Register %s could not be read: %s", register, exception)
+            continue
+
+        if value is not None:
+            results[register] = (value, unit)
+            _LOGGER.info("KMP register %s: %s %s", register, value, unit or "")
+        else:
+            _LOGGER.debug("KMP register %s returned no value", register)
+
+    return results
+
+
 class KamstrupUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching data from the Kamstrup serial reader."""
 
@@ -167,7 +241,17 @@ class KamstrupUpdateCoordinator(DataUpdateCoordinator):
         self.kamstrup = client
         self.device_info = device_info
         self._commands: List[int] = []
+        self._io_lock = asyncio.Lock()
         super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=scan_interval)
+
+    async def async_scan_registers(
+        self, registers: list[int]
+    ) -> dict[int, tuple[Any, Any]]:
+        """Read a list of registers once without adding them to polling."""
+        async with self._io_lock:
+            return await self.hass.async_add_executor_job(
+                _scan_kamstrup_registers, self.kamstrup, registers
+            )
 
     def register_command(self, command: int) -> None:
         """Add a command to the commands list."""
@@ -191,9 +275,10 @@ class KamstrupUpdateCoordinator(DataUpdateCoordinator):
 
         try:
             # Run blocking I/O in executor to avoid blocking the event loop
-            values = await self.hass.async_add_executor_job(
-                _read_kamstrup_values, self.kamstrup, self._commands
-            )
+            async with self._io_lock:
+                values = await self.hass.async_add_executor_job(
+                    _read_kamstrup_values, self.kamstrup, self._commands
+                )
         except Exception as exception:
             # serialx raises OSError/TimeoutError for connection issues
             # (device unplugged, permission lost, no response in time) and
