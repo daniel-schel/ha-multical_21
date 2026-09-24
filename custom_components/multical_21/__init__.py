@@ -310,6 +310,7 @@ class KamstrupUpdateCoordinator(DataUpdateCoordinator):
                 )
             raise UpdateFailed() from exception
 
+        previous_data = self.data or {}
         failed_counter = len(self._commands) - len(values)
 
         for command in self._commands:
@@ -319,6 +320,8 @@ class KamstrupUpdateCoordinator(DataUpdateCoordinator):
                 _LOGGER.debug(
                     "New value for sensor %s, value: %s %s", command, value, unit
                 )
+            elif command in previous_data:
+                data[command] = previous_data[command]
 
         # Only log error if we have commands registered but got no data
         if len(data) == 0 and len(self._commands) > 0:

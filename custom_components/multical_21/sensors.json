@@ -34,18 +34,18 @@
   },
   {
     "key": "99",
-    "name": "Info",
+    "name": "InfoCode",
     "icon": "mdi:information",
     "entity_registry_enabled_default": false
   },
   {
     "key": "98",
-    "name": "MeterDateShort",
+    "name": "TargetDate",
     "icon": "mdi:calendar-outline"
   },
   {
     "key": "1001",
-    "name": "MeterNumber",
+    "name": "FabricationNumber",
     "icon": "mdi:counter"
   },
   {
@@ -60,42 +60,42 @@
   },
   {
     "key": "113",
-    "name": "Register113",
+    "name": "InfoEvent",
     "icon": "mdi:information-outline"
   },
   {
     "key": "1005",
-    "name": "Register1005",
+    "name": "SoftwareEdition",
     "icon": "mdi:information-outline"
   },
   {
     "key": "138",
-    "name": "FlowRecord1Date",
+    "name": "MaxFlowDateMonth",
     "icon": "mdi:calendar-outline"
   },
   {
     "key": "139",
-    "name": "FlowRecord1",
+    "name": "MaxFlowMonth",
     "icon": "mdi:waves"
   },
   {
     "key": "140",
-    "name": "FlowRecord2Date",
+    "name": "MinFlowDateMonth",
     "icon": "mdi:calendar-outline"
   },
   {
     "key": "141",
-    "name": "FlowRecord2",
+    "name": "MinFlowMonth",
     "icon": "mdi:waves"
   },
   {
     "key": "153",
-    "name": "Register153",
+    "name": "ConfigurationNumber1",
     "icon": "mdi:alphabetical-variant"
   },
   {
     "key": "154",
-    "name": "Register154",
+    "name": "SoftwareChecksum1",
     "icon": "mdi:information-outline"
   },
   {
@@ -105,7 +105,7 @@
   },
   {
     "key": "222",
-    "name": "Register222",
+    "name": "ConfigurationChangedEventCount",
     "icon": "mdi:information-outline"
   },
   {
@@ -125,7 +125,7 @@
   },
   {
     "key": "239",
-    "name": "Register239",
+    "name": "VolumeV1HighResolution",
     "icon": "mdi:water-outline"
   },
   {
@@ -165,7 +165,7 @@
   },
   {
     "key": "262",
-    "name": "Register262",
+    "name": "ConfigurationChangedEventCount",
     "icon": "mdi:information-outline"
   },
   {
