@@ -125,8 +125,11 @@
   },
   {
     "key": "239",
-    "name": "VolumeV1HighResolution",
-    "icon": "mdi:water-outline"
+    "name": "V1Consumption",
+    "icon": "mdi:water-outline",
+    "device_class": "water",
+    "state_class": "total",
+    "native_unit_of_measurement": "L"
   },
   {
     "key": "240",
@@ -136,12 +139,26 @@
   {
     "key": "241",
     "name": "Register241",
-    "icon": "mdi:water-outline"
+    "icon": "mdi:water-outline",
+    "device_class": "volume_flow_rate",
+    "state_class": "measurement",
+    "native_unit_of_measurement": "L/h"
   },
   {
     "key": "242",
     "name": "Register242",
-    "icon": "mdi:water-outline"
+    "icon": "mdi:water-outline",
+    "device_class": "volume_flow_rate",
+    "state_class": "measurement",
+    "native_unit_of_measurement": "L/h"
+  },
+  {
+    "key": "243",
+    "name": "V1Reverse",
+    "icon": "mdi:water-sync",
+    "device_class": "water",
+    "state_class": "total",
+    "native_unit_of_measurement": "m³"
   },
   {
     "key": "244",
@@ -186,72 +203,114 @@
   {
     "key": "292",
     "name": "Register292",
-    "icon": "mdi:thermometer"
+    "icon": "mdi:thermometer",
+    "device_class": "temperature",
+    "state_class": "measurement",
+    "native_unit_of_measurement": "°C"
   },
   {
     "key": "293",
     "name": "Register293",
-    "icon": "mdi:thermometer"
+    "icon": "mdi:thermometer",
+    "device_class": "temperature",
+    "state_class": "measurement",
+    "native_unit_of_measurement": "°C"
   },
   {
     "key": "294",
     "name": "Register294",
-    "icon": "mdi:thermometer"
+    "icon": "mdi:thermometer",
+    "device_class": "temperature",
+    "state_class": "measurement",
+    "native_unit_of_measurement": "°C"
   },
   {
     "key": "295",
     "name": "Register295",
-    "icon": "mdi:thermometer"
+    "icon": "mdi:thermometer",
+    "device_class": "temperature",
+    "state_class": "measurement",
+    "native_unit_of_measurement": "°C"
   },
   {
     "key": "296",
     "name": "Register296",
-    "icon": "mdi:thermometer"
+    "icon": "mdi:thermometer",
+    "device_class": "temperature",
+    "state_class": "measurement",
+    "native_unit_of_measurement": "°C"
   },
   {
     "key": "297",
     "name": "Register297",
-    "icon": "mdi:thermometer"
+    "icon": "mdi:thermometer",
+    "device_class": "temperature",
+    "state_class": "measurement",
+    "native_unit_of_measurement": "°C"
   },
   {
     "key": "298",
     "name": "Register298",
-    "icon": "mdi:thermometer-alert"
+    "icon": "mdi:thermometer-alert",
+    "device_class": "temperature",
+    "state_class": "measurement",
+    "native_unit_of_measurement": "°C"
   },
   {
     "key": "299",
     "name": "Register299",
-    "icon": "mdi:thermometer"
+    "icon": "mdi:thermometer",
+    "device_class": "temperature",
+    "state_class": "measurement",
+    "native_unit_of_measurement": "°C"
   },
   {
     "key": "300",
     "name": "Register300",
-    "icon": "mdi:thermometer"
+    "icon": "mdi:thermometer",
+    "device_class": "temperature",
+    "state_class": "measurement",
+    "native_unit_of_measurement": "°C"
   },
   {
     "key": "301",
     "name": "Register301",
-    "icon": "mdi:thermometer"
+    "icon": "mdi:thermometer",
+    "device_class": "temperature",
+    "state_class": "measurement",
+    "native_unit_of_measurement": "°C"
   },
   {
     "key": "302",
     "name": "Register302",
-    "icon": "mdi:thermometer"
+    "icon": "mdi:thermometer",
+    "device_class": "temperature",
+    "state_class": "measurement",
+    "native_unit_of_measurement": "°C"
   },
   {
     "key": "303",
     "name": "Register303",
-    "icon": "mdi:thermometer"
+    "icon": "mdi:thermometer",
+    "device_class": "temperature",
+    "state_class": "measurement",
+    "native_unit_of_measurement": "°C"
   },
   {
     "key": "304",
     "name": "Register304",
-    "icon": "mdi:thermometer"
+    "icon": "mdi:thermometer",
+    "device_class": "temperature",
+    "state_class": "measurement",
+    "native_unit_of_measurement": "°C"
   },
   {
     "key": "305",
     "name": "Register305",
-    "icon": "mdi:thermometer"
+    "icon": "mdi:thermometer",
+    "device_class": "temperature",
+    "state_class": "measurement",
+    "native_unit_of_measurement": "°C"
   },
   {
     "key": "306",

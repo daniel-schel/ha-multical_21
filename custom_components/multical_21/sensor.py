@@ -61,13 +61,16 @@ def _format_special_value(
 ) -> str | float:
     """Format KMP date/time values and integer-like information fields."""
     if unit == "yy:mm:dd":
-        return f"{int(value):06d}"[:2] + ":" + f"{int(value):06d}"[2:4] + ":" + f"{int(value):06d}"[4:]
+        formatted = f"{int(value):06d}"
+        if key in {"1003", "138", "140"}:
+            return f"20{formatted[:2]}-{formatted[2:4]}-{formatted[4:]}"
+        return f"{formatted[:2]}:{formatted[2:4]}:{formatted[4:]}"
     if unit == "yyyy:mm:dd":
         formatted = f"{int(value):08d}"
-        return f"{formatted[:4]}:{formatted[4:6]}:{formatted[6:]}"
+        return f"{formatted[:4]}-{formatted[4:6]}-{formatted[6:]}"
     if unit == "mm:dd":
         formatted = f"{int(value):04d}"
-        return f"{formatted[:2]}:{formatted[2:]}"
+        return f"{formatted[:2]}-{formatted[2:]}"
     if unit == "hh:mm:ss":
         formatted = f"{int(value):06d}"
         return f"{formatted[:2]}:{formatted[2:4]}:{formatted[4:]}"
