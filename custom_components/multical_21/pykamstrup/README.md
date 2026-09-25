@@ -23,6 +23,16 @@ big-endian two-byte value at the beginning of the response. The register
 address alone does not define the meaning of a value; names below remain
 neutral where the meter semantics have not been confirmed.
 
+The MULTICAL 21 documentation (Kamstrup, FILE100003019_A_DE_10.2023 and
+technical description 5512-898_N1_DE) confirms that the meter stores
+cumulative volume, reverse volume, and daily, monthly, and yearly logger
+values. It also documents daily, monthly, and yearly minimum, average, and
+maximum temperature values. Daily values represent the period since midnight;
+historical logger values are separate records and may depend on the installed
+communication module. The documentation does not map these functions to the
+KMP register numbers used here, so unconfirmed registers still require
+further measurements before they are renamed.
+
 ### Confirmed registers
 
 | Register | Hex | Observed type or unit | Observation |
@@ -38,7 +48,7 @@ neutral where the meter semantics have not been confirmed.
 | 155 | `0x009B` | `Wh` | `0` at scan time; meaning unconfirmed |
 | 222 | `0x00DE` | information | `0` |
 | 223 | `0x00DF` | `L` | `0` at scan time |
-| 237-240 | `0x00ED-0x00F0` | information/volume | `239` returned `79429.271 L`; other values need observation |
+| 237-240 | `0x00ED-0x00F0` | information/volume | `239` is a cumulative V1 consumption value in `L`; its absolute value has an observed offset of about `500000 L` compared with V1 converted to litres |
 | 241-242 | `0x00F1-0x00F2` | `L/h` | `0` at scan time |
 | 243 | `0x00F3` | `m3` | Reverse volume (`V1Reverse`), `0.003 m3` at scan time |
 | 244 | `0x00F4` | information | `0` |
@@ -74,6 +84,24 @@ In particular, a zero value does not mean that a register is unused. Meaning
 should be inferred by observing changes during water flow, temperature changes,
 or other known meter events. Register `298` should also be monitored to
 determine whether `128 deg C` is a sentinel value.
+
+The export captured on 2026-09-25 provides more detail for registers 292-305.
+Register 292 and register 299 change as live temperature values. The other
+temperature registers are returned in groups of three, consistent with stored
+minimum, maximum, and average values described by the technical manual. Based
+on the observed value ranges, registers 292-298 are interpreted as water
+temperature values and 299-305 as ambient/meter temperature values. The
+second group in each series appears to represent the previous period. This
+interpretation remains dependent on the local meter configuration. The
+values `127`, `-127`, and `128` appeared in registers 296-298 and 303-304;
+these are treated as unavailable sentinel values by the integration rather
+than as real temperatures.
+
+The export captured on 2026-09-25 strengthens the interpretation of register
+239: it increased from `79449.332 L` to `79783.610 L`, while V1 increased
+from `579.449 m3` to `579.783 m3`. Both changes represent about `334 L`, and
+register 239 did not reset at midnight. The approximately `500000 L` offset
+is still unexplained, but the register is not a daily counter.
 
 ### Search history
 

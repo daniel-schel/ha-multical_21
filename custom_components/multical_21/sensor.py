@@ -58,8 +58,10 @@ DESCRIPTIONS = _load_descriptions()
 
 def _format_special_value(
     key: str, value: str | float, unit: str | None
-) -> str | float:
+) -> str | float | None:
     """Format KMP date/time values and integer-like information fields."""
+    if unit == "°C" and float(value) in {-127, 127, 128}:
+        return None
     if unit == "yy:mm:dd":
         formatted = f"{int(value):06d}"
         if key in {"1003", "138", "140"}:
